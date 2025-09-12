@@ -4,12 +4,15 @@ import br.gov.agu.nutec.solluxapp.exceptions.PlanilhaMapperException;
 import br.gov.agu.nutec.solluxapp.exceptions.ResourceAlreadyExistsException;
 import br.gov.agu.nutec.solluxapp.repository.PlanilhaRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -46,15 +49,26 @@ public class PlanilhaValidator {
 
     public void validarPlanilha(final Sheet sheet) {
         Row header = sheet.getRow(0);
-        for (int i = 0; i < EXPECTED_COLUMNS.size(); i++) {
-            String cellValue = header.getCell(i).getStringCellValue().trim();
-            if (!EXPECTED_COLUMNS.get(i).equalsIgnoreCase(cellValue)) {
-                throw new PlanilhaMapperException(
-                        String.format("Coluna inválida na posição %d: esperado '%s', encontrado '%s'.",
-                                i + 1, EXPECTED_COLUMNS.get(i), cellValue
-                )
-                );
-            }
+
+        if (header == null) {
+            throw new PlanilhaMapperException("A planilha não possui cabeçalho.");
         }
+
+        Set<String> encontradas = new HashSet<>();
+        for (Cell cell : header) {
+            encontradas.add(safeCellValue(cell).toLowerCase());
+        }
+
+        List<String> faltando = EXPECTED_COLUMNS.stream()
+                .filter(col -> !encontradas.contains(col.toLowerCase()))
+                .toList();
+
+        if (!faltando.isEmpty()) {
+            throw new PlanilhaMapperException("Colunas faltando: " + String.join(", ", faltando));
+        }
+    }
+
+    private String safeCellValue(Cell cell) {
+        return (cell == null) ? "" : cell.getStringCellValue().trim();
     }
 }
