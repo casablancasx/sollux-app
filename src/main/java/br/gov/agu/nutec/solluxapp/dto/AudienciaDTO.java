@@ -2,9 +2,11 @@ package br.gov.agu.nutec.solluxapp.dto;
 
 import br.gov.agu.nutec.solluxapp.enums.Prioridade;
 import br.gov.agu.nutec.solluxapp.enums.Turno;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 import java.util.List;
+
 
 public record AudienciaDTO(
         String cnj,
