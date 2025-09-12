@@ -31,11 +31,10 @@ public class PlanilhaService {
         validarArquivo(file);
         List<AudienciaDTO> lista = new ArrayList<>();
 
-        try (InputStream is = file.getInputStream();
-             Workbook workbook = new HSSFWorkbook(is);) {
+        try (InputStream is = file.getInputStream(); Workbook workbook = new HSSFWorkbook(is);) {
+
             Sheet sheet = workbook.getSheetAt(0);
             validarPlanilha(sheet);
-
 
             for (Row row : sheet) {
 
