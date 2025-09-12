@@ -26,7 +26,7 @@ public class PlanilhaReader {
         try (InputStream is = file.getInputStream(); Workbook workbook = WorkbookFactory.create(is)) {
             Sheet sheet = workbook.getSheetAt(0);
 
-            validator.validarPlanilha(sheet,);
+            validator.validarPlanilha(sheet);
 
             List<AudienciaDTO> audiencias = new ArrayList<>();
             for (Row row : sheet) {
