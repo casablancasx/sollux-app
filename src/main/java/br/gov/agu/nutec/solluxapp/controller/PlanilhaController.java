@@ -20,7 +20,7 @@ public class PlanilhaController {
 
 
     @PostMapping("/importar")
-    public ResponseEntity<Map<String, String>> importarPlanilha(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Map<String, String>> importarPlanilha(@RequestParam("file") MultipartFile file) throws Exception {
 
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("message", "Arquivo vazio"));

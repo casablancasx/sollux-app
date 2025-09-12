@@ -2,6 +2,7 @@ package br.gov.agu.nutec.solluxapp.service;
 
 import br.gov.agu.nutec.solluxapp.dto.AudienciaDTO;
 import br.gov.agu.nutec.solluxapp.mapper.AudienciaRowMapper;
+import br.gov.agu.nutec.solluxapp.repository.PlanilhaRepository;
 import br.gov.agu.nutec.solluxapp.util.FileHashUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
@@ -22,9 +23,10 @@ import java.util.Map;
 public class PlanilhaService {
 
     private final AudienciaRowMapper audienciaRowMapper;
+    private final PlanilhaRepository planilhaRepository;
 
 
-    public Map<String, String> importarPlanilha(MultipartFile file) {
+    public Map<String, String> importarPlanilha(MultipartFile file) throws Exception {
 
         validarArquivo(file);
         List<AudienciaDTO> lista = new ArrayList<>();
@@ -52,8 +54,12 @@ public class PlanilhaService {
     private void validarArquivo(MultipartFile file) throws Exception {
 
         String nomeArquivo = file.getOriginalFilename();
-        String hashArquivo = FileHashUtil.getFileHash(file, "MD5");
+        String hash = FileHashUtil.getFileHash(file, "MD5");
 
+
+        if (planilhaRepository.existsByHash(hash)) {
+            throw new IllegalArgumentException("Arquivo já importado anteriormente.");
+        }
 
 
         if (file.isEmpty()) {
