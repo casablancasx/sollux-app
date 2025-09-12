@@ -4,6 +4,8 @@ import br.gov.agu.nutec.solluxapp.dto.AudienciaDTO;
 import br.gov.agu.nutec.solluxapp.entity.PlanilhaEntity;
 import br.gov.agu.nutec.solluxapp.entity.UsuarioEntity;
 import br.gov.agu.nutec.solluxapp.enums.Role;
+import br.gov.agu.nutec.solluxapp.exceptions.ResourceNotFoundException;
+import br.gov.agu.nutec.solluxapp.exceptions.UserUnauthorizedException;
 import br.gov.agu.nutec.solluxapp.mapper.AudienciaRowMapper;
 import br.gov.agu.nutec.solluxapp.producer.AudienciaProducer;
 import br.gov.agu.nutec.solluxapp.reader.PlanilhaReader;
@@ -71,10 +73,11 @@ public class PlanilhaService {
 
     private UsuarioEntity getUsuario(String token) {
         long sapiensId = TokenUtil.getSapiensIdFromToken(token);
-        UsuarioEntity usuario = usuarioRepository.findBySapiensId(sapiensId).orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+        UsuarioEntity usuario = usuarioRepository.findBySapiensId(sapiensId)
+                .orElseThrow(() -> new ResourceNotFoundException("Nenhum usuário encontrado para o sapiensId: " + sapiensId));
 
         if (usuario.getRole() != Role.ADMIN) {
-            throw new RuntimeException("Acesso negado. Usuário não é administrador.");
+            throw new UserUnauthorizedException("Usuário não autorizado a realizar a ação de importar planilha.");
         }
 
         return usuario;

@@ -1,5 +1,6 @@
 package br.gov.agu.nutec.solluxapp.validator;
 
+import br.gov.agu.nutec.solluxapp.exceptions.ResourceAlreadyExistsException;
 import br.gov.agu.nutec.solluxapp.repository.PlanilhaRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
@@ -39,7 +40,7 @@ public class PlanilhaValidator {
         }
 
         if (planilhaRepository.existsByHash(hash)) {
-            throw new IllegalArgumentException("Arquivo já importado anteriormente.");
+            throw new ResourceAlreadyExistsException("Arquivo já importado anteriormente.");
         }
     }
 
