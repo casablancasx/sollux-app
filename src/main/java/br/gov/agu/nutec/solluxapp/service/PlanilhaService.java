@@ -14,6 +14,7 @@ import br.gov.agu.nutec.solluxapp.util.FileHashUtil;
 import br.gov.agu.nutec.solluxapp.util.TokenUtil;
 import br.gov.agu.nutec.solluxapp.validator.PlanilhaValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,17 +34,18 @@ public class PlanilhaService {
     private final PlanilhaReader planilhaReader;
     private final PlanilhaValidator validator;
 
+    @Value("${app.timezone}")
+    private String timeZone;
+
 
     public Map<String, Object> importarPlanilha(final MultipartFile file,final String token) throws Exception {
-
+        UsuarioEntity usuario = getUsuario(token);
 
         String hash = FileHashUtil.getFileHash(file, "SHA-256");
 
         validator.validarArquivo(file, hash);
 
         List<AudienciaDTO> audiencias = planilhaReader.lerPlanilha(file);
-
-        UsuarioEntity usuario = getUsuario(token);
 
         audiencias.forEach(audienciaProducer::enviarAudiencia);
 
@@ -64,7 +66,7 @@ public class PlanilhaService {
         PlanilhaEntity planilha = new PlanilhaEntity();
         planilha.setNomeArquivo(file.getOriginalFilename());
         planilha.setHash(hash);
-        planilha.setDataUpload(LocalDateTime.now(ZoneId.systemDefault()));
+        planilha.setDataUpload(LocalDateTime.now(ZoneId.of(timeZone)));
         planilha.setUsuario(usuario);
         planilhaRepository.save(planilha);
     }
