@@ -14,8 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -29,7 +27,6 @@ public class PlanilhaService {
     public Map<String, String> importarPlanilha(MultipartFile file) throws Exception {
 
         validarArquivo(file);
-        List<AudienciaDTO> lista = new ArrayList<>();
 
         try (InputStream is = file.getInputStream(); Workbook workbook = new HSSFWorkbook(is);) {
 
@@ -42,7 +39,7 @@ public class PlanilhaService {
                     break;
                 }
                 AudienciaDTO audiencia = audienciaRowMapper.getAudienciaRow(row);
-                lista.add(audiencia);
+
             }
 
         } catch (IOException e) {
@@ -56,22 +53,21 @@ public class PlanilhaService {
     private void validarArquivo(MultipartFile file) throws Exception {
 
         String nomeArquivo = file.getOriginalFilename();
-        String hash = FileHashUtil.getFileHash(file, "MD5");
 
-
-        if (planilhaRepository.existsByHash(hash)) {
-            throw new IllegalArgumentException("Arquivo já importado anteriormente.");
+        if (nomeArquivo == null || !nomeArquivo.endsWith(".xls")) {
+            throw new IllegalArgumentException("Arquivo inválido. Apenas arquivos .xls são suportados.");
         }
-
 
         if (file.isEmpty()) {
             throw new IllegalArgumentException("Arquivo vazio");
         }
 
+        String hash = FileHashUtil.getFileHash(file, "MD5");
 
-        if (nomeArquivo == null || !nomeArquivo.endsWith(".xls")) {
-            throw new IllegalArgumentException("Arquivo inválido. Apenas arquivos .xls são suportados.");
+        if (planilhaRepository.existsByHash(hash)) {
+            throw new IllegalArgumentException("Arquivo já importado anteriormente.");
         }
+
 
     }
 
