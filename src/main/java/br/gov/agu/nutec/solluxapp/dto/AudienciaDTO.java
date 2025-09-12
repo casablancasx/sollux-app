@@ -8,6 +8,7 @@ import java.util.List;
 public record AudienciaDTO(
         String cnj,
         LocalDate data,
+        String hora,
         Turno turno,
         String sala,
         String orgaoJulgador,
@@ -19,4 +20,5 @@ public record AudienciaDTO(
         String tipo,
         String situacao
 ) {
+
 }
