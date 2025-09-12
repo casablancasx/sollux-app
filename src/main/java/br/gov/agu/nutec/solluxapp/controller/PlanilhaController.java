@@ -18,7 +18,7 @@ public class PlanilhaController {
 
 
     @PostMapping("/importar")
-    public ResponseEntity<Map<String, String>> importarPlanilha(@RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String token) throws Exception {
+    public ResponseEntity<Map<String, Object>> importarPlanilha(@RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String token) throws Exception {
         var response = planilhaService.importarPlanilha(file,token);
         return ResponseEntity.ok(response);
     }

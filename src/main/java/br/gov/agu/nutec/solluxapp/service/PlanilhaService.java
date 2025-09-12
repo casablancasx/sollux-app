@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +34,7 @@ public class PlanilhaService {
     private final PlanilhaValidator validator;
 
 
-    public Map<String, String> importarPlanilha(MultipartFile file, String token) throws Exception {
+    public Map<String, Object> importarPlanilha(MultipartFile file, String token) throws Exception {
 
 
         String hash = FileHashUtil.getFileHash(file, "SHA-256");
@@ -48,7 +49,13 @@ public class PlanilhaService {
 
         salvarPlanilha(file, hash, usuario);
 
-        return Map.of("message", "Planilha importada com sucesso");
+        return Map.of(
+                "message", "Planilha importada com sucesso",
+                "arquivo", Objects.requireNonNull(file.getOriginalFilename()),
+                "hash", hash,
+                "usuario", usuario.getNome(),
+                "total_audiencias", audiencias.size()
+        );
     }
 
 
