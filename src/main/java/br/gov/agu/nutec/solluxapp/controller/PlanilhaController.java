@@ -1,13 +1,12 @@
 package br.gov.agu.nutec.solluxapp.controller;
 
+import br.gov.agu.nutec.solluxapp.dto.PlanilhaResponseDTO;
 import br.gov.agu.nutec.solluxapp.service.PlanilhaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Map;
 
 @RestController
 @RequestMapping("/planilhas")
@@ -18,8 +17,8 @@ public class PlanilhaController {
 
 
     @PostMapping("/importar")
-    public ResponseEntity<Map<String, Object>> importarPlanilha(final @RequestParam("file") MultipartFile file, final @RequestHeader("Authorization") String token) throws Exception {
-        var response = planilhaService.importarPlanilha(file,token);
+    public ResponseEntity<PlanilhaResponseDTO> importarPlanilha(final @RequestParam("file") MultipartFile file, final @RequestHeader("Authorization") String token) throws Exception {
+        PlanilhaResponseDTO response = planilhaService.importarPlanilha(file,token);
         return ResponseEntity.ok(response);
     }
 

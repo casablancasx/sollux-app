@@ -1,12 +1,12 @@
 package br.gov.agu.nutec.solluxapp.service;
 
 import br.gov.agu.nutec.solluxapp.dto.AudienciaDTO;
+import br.gov.agu.nutec.solluxapp.dto.PlanilhaResponseDTO;
 import br.gov.agu.nutec.solluxapp.entity.PlanilhaEntity;
 import br.gov.agu.nutec.solluxapp.entity.UsuarioEntity;
 import br.gov.agu.nutec.solluxapp.enums.Role;
 import br.gov.agu.nutec.solluxapp.exceptions.ResourceNotFoundException;
 import br.gov.agu.nutec.solluxapp.exceptions.UserUnauthorizedException;
-import br.gov.agu.nutec.solluxapp.producer.AudienciaProducer;
 import br.gov.agu.nutec.solluxapp.reader.PlanilhaReader;
 import br.gov.agu.nutec.solluxapp.repository.PlanilhaRepository;
 import br.gov.agu.nutec.solluxapp.repository.UsuarioRepository;
@@ -21,8 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +37,7 @@ public class PlanilhaService {
     private String timeZone;
 
 
-    public Map<String, Object> importarPlanilha(final MultipartFile file,final String token) throws Exception {
+    public PlanilhaResponseDTO importarPlanilha(final MultipartFile file, final String token) throws Exception {
 
         UsuarioEntity usuario = getUsuario(token);
 
@@ -52,12 +51,12 @@ public class PlanilhaService {
 
         salvarPlanilha(file, hash, usuario);
 
-        return Map.of(
-                "message", "Planilha importada com sucesso",
-                "arquivo", Objects.requireNonNull(file.getOriginalFilename()),
-                "hash", hash,
-                "usuario", usuario.getNome(),
-                "total_audiencias", audiencias.size()
+        return new PlanilhaResponseDTO(
+                "Audiencias importadas com sucesso",
+                file.getOriginalFilename(),
+                usuario.getNome(),
+                hash,
+                audiencias.size()
         );
     }
 
