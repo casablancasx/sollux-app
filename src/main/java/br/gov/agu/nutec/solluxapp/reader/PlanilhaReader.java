@@ -1,6 +1,7 @@
 package br.gov.agu.nutec.solluxapp.reader;
 
 import br.gov.agu.nutec.solluxapp.dto.AudienciaDTO;
+import br.gov.agu.nutec.solluxapp.exceptions.PlanilhaMapperException;
 import br.gov.agu.nutec.solluxapp.mapper.AudienciaRowMapper;
 import br.gov.agu.nutec.solluxapp.validator.PlanilhaValidator;
 import lombok.RequiredArgsConstructor;
@@ -30,16 +31,16 @@ public class PlanilhaReader {
 
             List<AudienciaDTO> audiencias = new ArrayList<>();
             for (Row row : sheet) {
-                if (row == null || row.getRowNum() == 0) continue;
+
                 if (row.getCell(0) == null) break;
 
                 AudienciaDTO audienciaDTO = audienciaRowMapper.getAudienciaRow(row);
-                System.out.println(audienciaDTO.cnj());
                 audiencias.add(audienciaDTO);
             }
+
             return audiencias;
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao ler a planilha", e);
+            throw new PlanilhaMapperException("Erro ao ler a planilha");
         }
     }
 }

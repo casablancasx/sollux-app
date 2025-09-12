@@ -30,8 +30,8 @@ public class PlanilhaService {
 
     private final PlanilhaRepository planilhaRepository;
     private final UsuarioRepository usuarioRepository;
-    private final AudienciaProducer audienciaProducer;
     private final PlanilhaReader planilhaReader;
+    private final AudienciaService audienciaService;
     private final PlanilhaValidator validator;
 
     @Value("${app.timezone}")
@@ -39,6 +39,7 @@ public class PlanilhaService {
 
 
     public Map<String, Object> importarPlanilha(final MultipartFile file,final String token) throws Exception {
+
         UsuarioEntity usuario = getUsuario(token);
 
         String hash = FileHashUtil.getFileHash(file, "SHA-256");
@@ -47,7 +48,7 @@ public class PlanilhaService {
 
         List<AudienciaDTO> audiencias = planilhaReader.lerPlanilha(file);
 
-        audiencias.forEach(audienciaProducer::enviarAudiencia);
+        audienciaService.enviarAudiencias(audiencias);
 
         salvarPlanilha(file, hash, usuario);
 

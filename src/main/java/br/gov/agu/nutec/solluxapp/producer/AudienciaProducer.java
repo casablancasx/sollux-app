@@ -1,6 +1,6 @@
 package br.gov.agu.nutec.solluxapp.producer;
 
-import br.gov.agu.nutec.solluxapp.dto.AudienciaDTO;
+import br.gov.agu.nutec.solluxapp.dto.AudienciaMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +15,7 @@ public class AudienciaProducer {
     @Value("${rabbitmq.exchange.audiencia-pendente}")
     private String exchangeAudienciaPendente;
 
-    public void enviarAudiencia(AudienciaDTO audienciaDTO){
-        rabbitTemplate.convertAndSend(exchangeAudienciaPendente,"",audienciaDTO);
+    public void enviarAudiencia(AudienciaMessage audienciaMessage) {
+        rabbitTemplate.convertAndSend(exchangeAudienciaPendente,"",audienciaMessage);
     }
 }

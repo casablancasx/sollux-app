@@ -1,9 +1,6 @@
 package br.gov.agu.nutec.solluxapp.exceptions.handler;
 
-import br.gov.agu.nutec.solluxapp.exceptions.FileInvalidException;
-import br.gov.agu.nutec.solluxapp.exceptions.ResourceAlreadyExistsException;
-import br.gov.agu.nutec.solluxapp.exceptions.ResourceNotFoundException;
-import br.gov.agu.nutec.solluxapp.exceptions.UserUnauthorizedException;
+import br.gov.agu.nutec.solluxapp.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -62,6 +59,18 @@ public class RestExceptionHandler {
                 request.getRequestURI()
         );
         return ResponseEntity.status(401).body(err);
+    }
+
+    @ExceptionHandler(PlanilhaMapperException.class)
+    public ResponseEntity<StandardError> planilhaMapperException(PlanilhaMapperException e, HttpServletRequest request) {
+        StandardError err = new StandardError(
+                java.time.Instant.now(),
+                500,
+                "Planilha Mapper Exception",
+                e.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(500).body(err);
     }
 
 }
