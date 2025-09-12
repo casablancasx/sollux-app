@@ -31,7 +31,8 @@ public class UsuarioEntity {
     private Role role;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
-
     private List<PlanilhaEntity> planilhas;
 
+    @Column(name = "sapiens_id")
+    private Long sapiensId;
 }
