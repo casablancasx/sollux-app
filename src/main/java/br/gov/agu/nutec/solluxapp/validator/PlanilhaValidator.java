@@ -29,7 +29,7 @@ public class PlanilhaValidator {
 
     private final PlanilhaRepository planilhaRepository;
 
-    public void validarArquivo(MultipartFile file, String hash) {
+    public void validarArquivo(final MultipartFile file, final String hash) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("Arquivo vazio.");
         }
@@ -44,7 +44,7 @@ public class PlanilhaValidator {
         }
     }
 
-    public void validarPlanilha(Sheet sheet) {
+    public void validarPlanilha(final Sheet sheet) {
         Row header = sheet.getRow(0);
         for (int i = 0; i < EXPECTED_COLUMNS.size(); i++) {
             String cellValue = header.getCell(i).getStringCellValue().trim();

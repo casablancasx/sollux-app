@@ -22,7 +22,7 @@ public class PlanilhaReader {
     private final AudienciaRowMapper audienciaRowMapper;
     private final PlanilhaValidator validator;
 
-    public List<AudienciaDTO> lerPlanilha(MultipartFile file) {
+    public List<AudienciaDTO> lerPlanilha(final MultipartFile file) {
         try (InputStream is = file.getInputStream(); Workbook workbook = WorkbookFactory.create(is)) {
             Sheet sheet = workbook.getSheetAt(0);
 

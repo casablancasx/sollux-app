@@ -6,7 +6,6 @@ import br.gov.agu.nutec.solluxapp.entity.UsuarioEntity;
 import br.gov.agu.nutec.solluxapp.enums.Role;
 import br.gov.agu.nutec.solluxapp.exceptions.ResourceNotFoundException;
 import br.gov.agu.nutec.solluxapp.exceptions.UserUnauthorizedException;
-import br.gov.agu.nutec.solluxapp.mapper.AudienciaRowMapper;
 import br.gov.agu.nutec.solluxapp.producer.AudienciaProducer;
 import br.gov.agu.nutec.solluxapp.reader.PlanilhaReader;
 import br.gov.agu.nutec.solluxapp.repository.PlanilhaRepository;
@@ -15,7 +14,6 @@ import br.gov.agu.nutec.solluxapp.util.FileHashUtil;
 import br.gov.agu.nutec.solluxapp.util.TokenUtil;
 import br.gov.agu.nutec.solluxapp.validator.PlanilhaValidator;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,7 +34,7 @@ public class PlanilhaService {
     private final PlanilhaValidator validator;
 
 
-    public Map<String, Object> importarPlanilha(MultipartFile file, String token) throws Exception {
+    public Map<String, Object> importarPlanilha(final MultipartFile file,final String token) throws Exception {
 
 
         String hash = FileHashUtil.getFileHash(file, "SHA-256");
@@ -62,7 +60,7 @@ public class PlanilhaService {
 
 
 
-    private void salvarPlanilha(MultipartFile file, String hash, UsuarioEntity usuario) {
+    private void salvarPlanilha(final MultipartFile file,final String hash,final UsuarioEntity usuario) {
         PlanilhaEntity planilha = new PlanilhaEntity();
         planilha.setNomeArquivo(file.getOriginalFilename());
         planilha.setHash(hash);
@@ -71,7 +69,7 @@ public class PlanilhaService {
         planilhaRepository.save(planilha);
     }
 
-    private UsuarioEntity getUsuario(String token) {
+    private UsuarioEntity getUsuario(final String token) {
         long sapiensId = TokenUtil.getSapiensIdFromToken(token);
         UsuarioEntity usuario = usuarioRepository.findBySapiensId(sapiensId)
                 .orElseThrow(() -> new ResourceNotFoundException("Nenhum usuário encontrado para o sapiensId: " + sapiensId));
