@@ -24,6 +24,7 @@ public  class AudienciaRowMapper {
         LocalDate data  = getDataAudiencia(row.getCell(0));
         String hora = getHoraAudiencia(row.getCell(0));
         String cnj = row.getCell(1).getStringCellValue();
+        System.out.println(cnj);
         String orgaoJulgador = row.getCell(2).getStringCellValue();
         String poloAtivo = getPoloAtivo(row.getCell(3));
         String classeJudicial = row.getCell(4).getStringCellValue();

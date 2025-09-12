@@ -5,10 +5,10 @@ import br.gov.agu.nutec.solluxapp.mapper.AudienciaRowMapper;
 import br.gov.agu.nutec.solluxapp.repository.PlanilhaRepository;
 import br.gov.agu.nutec.solluxapp.util.FileHashUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,13 +32,16 @@ public class PlanilhaService {
         List<AudienciaDTO> lista = new ArrayList<>();
 
         try (InputStream is = file.getInputStream();
-             Workbook workbook = new XSSFWorkbook(is);) {
+             Workbook workbook = new HSSFWorkbook(is);) {
             Sheet sheet = workbook.getSheetAt(0);
             validarPlanilha(sheet);
 
-            for (int i = 1; i < sheet.getLastRowNum(); i++) {
-                Row row = sheet.getRow(i);
-                if (row == null) continue;
+
+            for (Row row : sheet) {
+
+                if (row == null || row.getRowNum() == 0) {
+                    break;
+                }
                 AudienciaDTO audiencia = audienciaRowMapper.getAudienciaRow(row);
                 lista.add(audiencia);
             }
@@ -67,8 +70,8 @@ public class PlanilhaService {
         }
 
 
-        if (nomeArquivo == null || !nomeArquivo.endsWith(".xlsx")) {
-            throw new IllegalArgumentException("Arquivo inválido. Apenas arquivos .xlsx são suportados.");
+        if (nomeArquivo == null || !nomeArquivo.endsWith(".xls")) {
+            throw new IllegalArgumentException("Arquivo inválido. Apenas arquivos .xls são suportados.");
         }
 
     }

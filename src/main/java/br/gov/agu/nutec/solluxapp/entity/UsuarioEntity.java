@@ -27,6 +27,7 @@ public class UsuarioEntity {
 
     private String cpf;
 
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
