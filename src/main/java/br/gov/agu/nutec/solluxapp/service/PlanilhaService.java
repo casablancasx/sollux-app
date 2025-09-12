@@ -3,6 +3,7 @@ package br.gov.agu.nutec.solluxapp.service;
 import br.gov.agu.nutec.solluxapp.dto.AudienciaDTO;
 import br.gov.agu.nutec.solluxapp.entity.PlanilhaEntity;
 import br.gov.agu.nutec.solluxapp.entity.UsuarioEntity;
+import br.gov.agu.nutec.solluxapp.enums.Role;
 import br.gov.agu.nutec.solluxapp.mapper.AudienciaRowMapper;
 import br.gov.agu.nutec.solluxapp.repository.PlanilhaRepository;
 import br.gov.agu.nutec.solluxapp.repository.UsuarioRepository;
@@ -13,12 +14,14 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
 
@@ -34,11 +37,19 @@ public class PlanilhaService {
     public Map<String, String> importarPlanilha(MultipartFile file, String token) throws Exception {
 
 
-        try (InputStream is = file.getInputStream(); Workbook workbook = new HSSFWorkbook(is);) {
+        String hash = FileHashUtil.getFileHash(file,"MD5");
+        validarArquivo(file, hash);
+        UsuarioEntity usuario = getUsuario(token);
+        lerPlanilha(file);
+        salvarPlanilha(file,hash,usuario);
 
-            String nomeArquivo = file.getOriginalFilename();
-            String hash = FileHashUtil.getFileHash(file, "MD5");
-            validarArquivo(nomeArquivo, hash);
+
+
+        return Map.of("message", "Planilha importada com sucesso");
+    }
+
+    private void lerPlanilha(MultipartFile file) {
+        try (InputStream is = file.getInputStream(); Workbook workbook = WorkbookFactory.create(is)) {
 
             Sheet sheet = workbook.getSheetAt(0);
             validarPlanilha(sheet);
@@ -49,34 +60,41 @@ public class PlanilhaService {
                 }
                 AudienciaDTO audiencia = audienciaRowMapper.getAudienciaRow(row);
             }
-
-            PlanilhaEntity planilhaEntity = new PlanilhaEntity();
-            planilhaEntity.setNomeArquivo(nomeArquivo);
-            planilhaEntity.setHash(hash);
-            planilhaEntity.setDataUpload(LocalDateTime.now(java.time.ZoneId.of("America/Sao_Paulo")));
-            long sapiensId = TokenUtil.getSapiensIdFromToken(token);
-            Optional<UsuarioEntity> usuarioOpt = usuarioRepository.findById(sapiensId);
-
-            if (usuarioOpt.isEmpty()) {
-                throw new IllegalArgumentException("Usuário não encontrado.");
-            }
-
-            planilhaEntity.setUsuario(usuarioOpt.get());
-            planilhaRepository.save(planilhaEntity);
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        return Map.of("message", "Planilha importada com sucesso");
     }
 
 
-    private void validarArquivo(String nomeArquivo, String hash) {
+    private void salvarPlanilha(MultipartFile file,String hash, UsuarioEntity usuario) {
+        PlanilhaEntity planilha = new PlanilhaEntity();
+        planilha.setNomeArquivo(file.getOriginalFilename());
+        planilha.setHash(hash);
+        planilha.setDataUpload(LocalDateTime.now(ZoneId.systemDefault()));
+        planilha.setUsuario(usuario);
+        planilhaRepository.save(planilha);
+    }
+
+    private UsuarioEntity getUsuario(String token) {
+        long sapiensId = TokenUtil.getSapiensIdFromToken(token);
+        UsuarioEntity usuario = usuarioRepository.findById(sapiensId).orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+
+        if (usuario.getRole() != Role.ADMIN) {
+            throw new RuntimeException("Acesso negado. Usuário não é administrador.");
+        }
+
+        return usuario;
+    }
 
 
-        if (nomeArquivo == null || !nomeArquivo.endsWith(".xls")) {
-            throw new IllegalArgumentException("Arquivo inválido. Apenas arquivos .xls são suportados.");
+    private void validarArquivo(MultipartFile file, String hash) {
+
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("Arquivo vazio.");
+        }
+
+        if (!file.getOriginalFilename().endsWith(".xls") && !file.getOriginalFilename().endsWith(".xlsx")) {
+            throw new IllegalArgumentException("Formato de arquivo inválido. Apenas arquivos .xls são aceitos.");
         }
 
         if (planilhaRepository.existsByHash(hash)) {

@@ -31,6 +31,6 @@ public class PlanilhaEntity {
     private String hash;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
+    @JoinColumn(name = "upload_pelo_id", nullable = false)
     private UsuarioEntity usuario;
 }
