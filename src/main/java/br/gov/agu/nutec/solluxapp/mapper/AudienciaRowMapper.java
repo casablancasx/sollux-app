@@ -2,21 +2,30 @@ package br.gov.agu.nutec.solluxapp.mapper;
 
 
 import br.gov.agu.nutec.solluxapp.dto.AudienciaDTO;
+import br.gov.agu.nutec.solluxapp.enums.Prioridade;
 import br.gov.agu.nutec.solluxapp.enums.Turno;
+import br.gov.agu.nutec.solluxapp.repository.AdvogadoRepository;
+import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.stereotype.Component;
 import static br.gov.agu.nutec.solluxapp.enums.Turno.TARDE;
 import static br.gov.agu.nutec.solluxapp.enums.Turno.MANHA;
-
+import  static br.gov.agu.nutec.solluxapp.enums.Prioridade.ALTA;
+import  static br.gov.agu.nutec.solluxapp.enums.Prioridade.NORMAL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public  class AudienciaRowMapper {
 
+
+    private final AdvogadoRepository advogadoRepository;
     private static final String POLO_PASSIVO = "INSTITUTO NACIONAL DO SEGURO SOCIAL - INSS";
+    private static final String RURAL = "Rural";
+    private static final String SALARIO_MATERNIDADE = "Salário-Maternidade (Art. 71/73)";
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public  AudienciaDTO getAudienciaRow(Row row) {
@@ -28,11 +37,12 @@ public  class AudienciaRowMapper {
         String poloAtivo = getPoloAtivo(row.getCell(3));
         String classeJudicial = row.getCell(4).getStringCellValue();
         List<String> advogados = getAdvogados(row.getCell(5));
-        String assunto =  row.getCell(6).getStringCellValue();
+        String assunto =  getAssunto(row.getCell(6));
         String tipo =  row.getCell(7).getStringCellValue();
         String sala =  row.getCell(8).getStringCellValue();
         String situacao =  row.getCell(9).getStringCellValue();
         Turno turno = getTurno(hora);
+        Prioridade prioridade = getPrioridade(assunto, advogados);
 
         return new AudienciaDTO(
                 cnj,
@@ -47,9 +57,30 @@ public  class AudienciaRowMapper {
                 advogados,
                 assunto,
                 tipo,
-                situacao
+                situacao,
+                prioridade
         );
 
+    }
+
+    private Prioridade getPrioridade(String assunto, List<String> advogados) {
+
+        boolean impeditivoAdvogado = advogadoRepository.existsByNomeIn(advogados);
+        if (assunto.equals(SALARIO_MATERNIDADE) && impeditivoAdvogado) {
+            return ALTA;
+        }
+        return NORMAL;
+    }
+
+
+    private String getAssunto(final Cell cell) {
+        //Lógica criada pois na planilha, as audiencias que possuem assunto "Rural"
+        // sem ser "Aposentadoria Rural (Art. 48/51)" são na verdade Salario Maternidade
+        String assunto = cell.getStringCellValue().trim();
+        if (assunto.equals(RURAL.trim())) {
+            return SALARIO_MATERNIDADE;
+        }
+        return assunto;
     }
 
 

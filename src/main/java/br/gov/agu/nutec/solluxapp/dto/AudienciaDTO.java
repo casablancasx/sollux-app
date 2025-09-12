@@ -1,5 +1,6 @@
 package br.gov.agu.nutec.solluxapp.dto;
 
+import br.gov.agu.nutec.solluxapp.enums.Prioridade;
 import br.gov.agu.nutec.solluxapp.enums.Turno;
 
 import java.time.LocalDate;
@@ -18,7 +19,9 @@ public record AudienciaDTO(
         List<String> advogados,
         String assunto,
         String tipo,
-        String situacao
+        String situacao,
+        Prioridade prioridade
+
 ) {
 
 }
