@@ -5,6 +5,7 @@ import br.gov.agu.nutec.solluxapp.entity.PlanilhaEntity;
 import br.gov.agu.nutec.solluxapp.entity.UsuarioEntity;
 import br.gov.agu.nutec.solluxapp.enums.Role;
 import br.gov.agu.nutec.solluxapp.mapper.AudienciaRowMapper;
+import br.gov.agu.nutec.solluxapp.producer.AudienciaProducer;
 import br.gov.agu.nutec.solluxapp.repository.PlanilhaRepository;
 import br.gov.agu.nutec.solluxapp.repository.UsuarioRepository;
 import br.gov.agu.nutec.solluxapp.util.FileHashUtil;
@@ -22,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,17 +35,17 @@ public class PlanilhaService {
     private final AudienciaRowMapper audienciaRowMapper;
     private final PlanilhaRepository planilhaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final AudienciaProducer audienciaProducer;
 
 
     public Map<String, String> importarPlanilha(MultipartFile file, String token) throws Exception {
 
 
-        String hash = FileHashUtil.getFileHash(file,"MD5");
+        String hash = FileHashUtil.getFileHash(file, "SHA-256");
         validarArquivo(file, hash);
         UsuarioEntity usuario = getUsuario(token);
         lerPlanilha(file);
-        salvarPlanilha(file,hash,usuario);
-
+        salvarPlanilha(file, hash, usuario);
 
 
         return Map.of("message", "Planilha importada com sucesso");
@@ -54,19 +57,21 @@ public class PlanilhaService {
             Sheet sheet = workbook.getSheetAt(0);
             validarPlanilha(sheet);
 
+            List<AudienciaDTO> audiencias = new ArrayList<>();
             for (Row row : sheet) {
-                if (row == null || row.getRowNum() == 0) {
-                    break;
-                }
-                AudienciaDTO audiencia = audienciaRowMapper.getAudienciaRow(row);
+                if (row == null || row.getRowNum() == 0) continue;
+                audiencias.add(audienciaRowMapper.getAudienciaRow(row));
             }
+
+            audiencias.forEach(audienciaProducer::enviarAudiencia);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
 
-    private void salvarPlanilha(MultipartFile file,String hash, UsuarioEntity usuario) {
+    private void salvarPlanilha(MultipartFile file, String hash, UsuarioEntity usuario) {
         PlanilhaEntity planilha = new PlanilhaEntity();
         planilha.setNomeArquivo(file.getOriginalFilename());
         planilha.setHash(hash);
