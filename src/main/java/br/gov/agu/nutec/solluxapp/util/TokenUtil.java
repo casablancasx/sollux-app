@@ -1,5 +1,6 @@
 package br.gov.agu.nutec.solluxapp.util;
 
+import br.gov.agu.nutec.solluxapp.exceptions.UserUnauthorizedException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -9,9 +10,9 @@ public class TokenUtil {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * Extrai o sapiens_ID (campo "id") do JWT usando Jackson para parsing eficiente.
+
      *
-     * @param token JWT completo (Bearer removido se necessário)
+     * @param token Token do Super Sapiens
      * @return sapiens_ID ou lanca excecao se o token for invalido
      */
     public static long getSapiensIdFromToken(String token) {
@@ -25,7 +26,7 @@ public class TokenUtil {
            JsonNode jsonNode = objectMapper.readTree(payload);
            return jsonNode.get("id").asLong();
        }catch (Exception e) {
-              throw new RuntimeException("Token invalido", e);
+              throw new UserUnauthorizedException("Token invalido");
        }
 
     }
