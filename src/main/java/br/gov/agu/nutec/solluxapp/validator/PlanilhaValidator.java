@@ -1,5 +1,6 @@
 package br.gov.agu.nutec.solluxapp.validator;
 
+import br.gov.agu.nutec.solluxapp.exceptions.PlanilhaMapperException;
 import br.gov.agu.nutec.solluxapp.exceptions.ResourceAlreadyExistsException;
 import br.gov.agu.nutec.solluxapp.repository.PlanilhaRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +35,7 @@ public class PlanilhaValidator {
             throw new IllegalArgumentException("Arquivo vazio.");
         }
 
-        if (!file.getOriginalFilename().endsWith(".xls")
-                && !file.getOriginalFilename().endsWith(".xlsx")) {
+        if (!file.getOriginalFilename().endsWith(".xls")  || !file.getOriginalFilename().endsWith(".xlsx")) {
             throw new IllegalArgumentException("Formato inválido. Apenas .xls ou .xlsx são suportados.");
         }
 
@@ -49,9 +49,10 @@ public class PlanilhaValidator {
         for (int i = 0; i < EXPECTED_COLUMNS.size(); i++) {
             String cellValue = header.getCell(i).getStringCellValue().trim();
             if (!EXPECTED_COLUMNS.get(i).equalsIgnoreCase(cellValue)) {
-                throw new IllegalArgumentException(
-                        String.format("Planilha inválida. Coluna esperada: %s mas encontrada: %s",
-                                EXPECTED_COLUMNS.get(i), cellValue)
+                throw new PlanilhaMapperException(
+                        String.format("Coluna inválida na posição %d: esperado '%s', encontrado '%s'.",
+                                i + 1, EXPECTED_COLUMNS.get(i), cellValue
+                )
                 );
             }
         }
