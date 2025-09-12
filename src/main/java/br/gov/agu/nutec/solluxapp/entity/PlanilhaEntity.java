@@ -29,4 +29,8 @@ public class PlanilhaEntity {
 
     @Column(name = "hash", nullable = false, unique = true)
     private String hash;
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private UsuarioEntity usuario;
 }
