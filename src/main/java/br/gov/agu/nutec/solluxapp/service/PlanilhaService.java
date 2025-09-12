@@ -64,7 +64,7 @@ public class PlanilhaService {
 
     private UsuarioEntity getUsuario(String token) {
         long sapiensId = TokenUtil.getSapiensIdFromToken(token);
-        UsuarioEntity usuario = usuarioRepository.findById(sapiensId).orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+        UsuarioEntity usuario = usuarioRepository.findBySapiensId(sapiensId).orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
 
         if (usuario.getRole() != Role.ADMIN) {
             throw new RuntimeException("Acesso negado. Usuário não é administrador.");

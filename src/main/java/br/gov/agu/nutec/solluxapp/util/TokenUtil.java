@@ -18,6 +18,8 @@ public class TokenUtil {
 
 
        try {
+           token = token.replace("Bearer ", "");
+
            String[] parts = token.split("\\.");
            String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
            JsonNode jsonNode = objectMapper.readTree(payload);

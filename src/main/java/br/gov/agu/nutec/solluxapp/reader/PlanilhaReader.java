@@ -31,7 +31,11 @@ public class PlanilhaReader {
             List<AudienciaDTO> audiencias = new ArrayList<>();
             for (Row row : sheet) {
                 if (row == null || row.getRowNum() == 0) continue;
-                audiencias.add(audienciaRowMapper.getAudienciaRow(row));
+                if (row.getCell(0) == null) break;
+
+                AudienciaDTO audienciaDTO = audienciaRowMapper.getAudienciaRow(row);
+                System.out.println(audienciaDTO.cnj());
+                audiencias.add(audienciaDTO);
             }
             return audiencias;
         } catch (Exception e) {
