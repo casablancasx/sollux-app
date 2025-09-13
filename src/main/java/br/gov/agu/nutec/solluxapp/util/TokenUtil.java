@@ -30,4 +30,6 @@ public class TokenUtil {
        }
 
     }
+
+    private  TokenUtil() {}
 }

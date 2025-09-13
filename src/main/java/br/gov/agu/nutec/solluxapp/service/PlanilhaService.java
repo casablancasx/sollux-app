@@ -72,7 +72,9 @@ public class PlanilhaService {
     }
 
     private UsuarioEntity getUsuario(final String token) {
+
         long sapiensId = TokenUtil.getSapiensIdFromToken(token);
+
         UsuarioEntity usuario = usuarioRepository.findBySapiensId(sapiensId)
                 .orElseThrow(() -> new ResourceNotFoundException("Nenhum usuário encontrado para o sapiensId: " + sapiensId));
 

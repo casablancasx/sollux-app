@@ -20,4 +20,6 @@ public class FileHashUtil {
 
         return HexFormat.of().formatHex(digest.digest());
     }
+
+    private FileHashUtil() {}
 }
