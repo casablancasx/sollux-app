@@ -61,12 +61,12 @@ public class RestExceptionHandler {
         return ResponseEntity.status(401).body(err);
     }
 
-    @ExceptionHandler(PlanilhaMapperException.class)
-    public ResponseEntity<StandardError> planilhaMapperException(PlanilhaMapperException e, HttpServletRequest request) {
+    @ExceptionHandler(PlanilhaException.class)
+    public ResponseEntity<StandardError> planilhaMapperException(PlanilhaException e, HttpServletRequest request) {
         StandardError err = new StandardError(
                 java.time.Instant.now(),
                 500,
-                "Planilha Mapper Exception",
+                "Planilha Exception",
                 e.getMessage(),
                 request.getRequestURI()
         );
