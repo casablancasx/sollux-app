@@ -22,7 +22,7 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.queue.sollux-alchemy}")
     private String filaAudienciaPendenteMsAlchemy;
 
-    @Value("${rabbitmq.queue.sollux-pace}")
+    @Value("${rabbitmq.queue.sollux-ms-pauta}")
     private String filaAudienciaPendenteMsPace;
 
 
@@ -62,7 +62,7 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue filaAudienciaPendenteMsPace(){
+    public Queue filaAudienciaPendenteMsPauta(){
         return QueueBuilder.durable(filaAudienciaPendenteMsPace).build();
     }
 
@@ -72,8 +72,8 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding bindingFilaAudienciaPendenteMsPace(FanoutExchange fanoutExchange, Queue filaAudienciaPendenteMsPace){
-        return BindingBuilder.bind(filaAudienciaPendenteMsPace).to(fanoutExchange);
+    public Binding bindingFilaAudienciaPendenteMsPace(FanoutExchange fanoutExchange, Queue filaAudienciaPendenteMsPauta){
+        return BindingBuilder.bind(filaAudienciaPendenteMsPauta).to(fanoutExchange);
     }
 
 

@@ -23,7 +23,7 @@ public class AudienciaService {
     public void enviarAudiencias(List<AudienciaDTO> audiencias) {
 
         for (AudienciaDTO audiencia : audiencias) {
-            Status status = audiencia.equals(audiencias.getLast()) ? EM_ANDAMENTO : FINALIZADO;
+            Status status = audiencia.equals(audiencias.getLast()) ? FINALIZADO : EM_ANDAMENTO;
             audienciaProducer.enviarAudiencia(new AudienciaMessage(status, audiencia));
         }
 
