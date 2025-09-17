@@ -2,7 +2,7 @@ package br.gov.agu.nutec.solluxapp.dto;
 
 import br.gov.agu.nutec.solluxapp.enums.Prioridade;
 import br.gov.agu.nutec.solluxapp.enums.Turno;
-import lombok.EqualsAndHashCode;
+import br.gov.agu.nutec.solluxapp.enums.Uf;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,8 +22,8 @@ public record AudienciaDTO(
         String assunto,
         String tipo,
         String situacao,
-        Prioridade prioridade
-
+        Prioridade prioridade,
+        Uf uf
 ) {
 
 }

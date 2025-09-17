@@ -4,6 +4,7 @@ package br.gov.agu.nutec.solluxapp.mapper;
 import br.gov.agu.nutec.solluxapp.dto.AudienciaDTO;
 import br.gov.agu.nutec.solluxapp.enums.Prioridade;
 import br.gov.agu.nutec.solluxapp.enums.Turno;
+import br.gov.agu.nutec.solluxapp.enums.Uf;
 import br.gov.agu.nutec.solluxapp.repository.AdvogadoRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -43,6 +44,7 @@ public  class AudienciaRowMapper {
         String situacao =  row.getCell(9).getStringCellValue();
         Turno turno = getTurno(hora);
         Prioridade prioridade = getPrioridade(assunto, advogados);
+        Uf uf = getUfFromOrgaoJulgador(orgaoJulgador);
 
         return new AudienciaDTO(
                 cnj,
@@ -58,9 +60,15 @@ public  class AudienciaRowMapper {
                 assunto,
                 tipo,
                 situacao,
-                prioridade
+                prioridade,
+                uf
         );
 
+    }
+
+    private Uf getUfFromOrgaoJulgador(String orgaoJulgador) {
+        String ultimaDuasLetras = orgaoJulgador.substring(orgaoJulgador.length() - 2);
+        return Uf.valueOf(ultimaDuasLetras);
     }
 
     private Prioridade getPrioridade(String assunto, List<String> advogados) {
