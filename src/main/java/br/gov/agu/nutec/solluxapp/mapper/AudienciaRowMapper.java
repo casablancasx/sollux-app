@@ -72,8 +72,7 @@ public  class AudienciaRowMapper {
     }
 
     private Prioridade getPrioridade(String assunto, List<String> advogados) {
-
-        boolean impeditivoAdvogado = advogadoRepository.existsByNomeIn(advogados);
+        boolean impeditivoAdvogado = advogadoRepository.existsSuspeitoByNomeIn(advogados);
         if (assunto.equals(SALARIO_MATERNIDADE) && impeditivoAdvogado) {
             return ALTA;
         }

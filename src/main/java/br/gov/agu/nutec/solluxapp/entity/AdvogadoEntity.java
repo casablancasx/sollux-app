@@ -20,4 +20,7 @@ public class AdvogadoEntity {
 
     @Column(name = "nome", nullable = false)
     private String nome;
+
+    @Column(name = "is_suspeito", nullable = false)
+    private boolean isSuspeito;
 }
