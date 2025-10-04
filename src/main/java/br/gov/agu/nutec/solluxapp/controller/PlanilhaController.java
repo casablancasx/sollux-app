@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
-@RequestMapping("/planilhas")
+@RequestMapping("/planilha")
 @RequiredArgsConstructor
 public class PlanilhaController {
 
