@@ -54,7 +54,7 @@ public class PlanilhaService {
         return new PlanilhaResponseDTO(
                 "Audiencias importadas com sucesso",
                 file.getOriginalFilename(),
-                "TESTE",
+                usuario.getNome(),
                 hash,
                 audiencias.size()
         );
