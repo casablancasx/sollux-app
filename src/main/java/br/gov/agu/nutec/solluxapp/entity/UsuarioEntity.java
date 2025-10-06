@@ -18,8 +18,8 @@ import java.util.List;
 public class UsuarioEntity {
 
     @Id
-    @Column(name = "usuario_id")
-    private Long usuarioId;
+    @Column(name = "sapiens_id")
+    private Long sapiensId;
 
     private String nome;
 
@@ -33,6 +33,5 @@ public class UsuarioEntity {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<PlanilhaEntity> planilhas;
 
-    @Column(name = "sapiens_id")
-    private Long sapiensId;
+
 }
