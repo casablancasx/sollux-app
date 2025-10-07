@@ -1,6 +1,5 @@
 package br.gov.agu.nutec.solluxapp.dto;
 
-import br.gov.agu.nutec.solluxapp.enums.Prioridade;
 import br.gov.agu.nutec.solluxapp.enums.Turno;
 import br.gov.agu.nutec.solluxapp.enums.Uf;
 
@@ -22,7 +21,6 @@ public record AudienciaDTO(
         String assunto,
         String tipo,
         String situacao,
-        Prioridade prioridade,
         Uf uf
 ) {
 

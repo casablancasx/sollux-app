@@ -5,7 +5,6 @@ import br.gov.agu.nutec.solluxapp.dto.AudienciaDTO;
 import br.gov.agu.nutec.solluxapp.enums.Prioridade;
 import br.gov.agu.nutec.solluxapp.enums.Turno;
 import br.gov.agu.nutec.solluxapp.enums.Uf;
-import br.gov.agu.nutec.solluxapp.repository.AdvogadoRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -23,7 +22,6 @@ import java.util.List;
 public  class AudienciaRowMapper {
 
 
-    private final AdvogadoRepository advogadoRepository;
     private static final String POLO_PASSIVO = "INSTITUTO NACIONAL DO SEGURO SOCIAL - INSS";
     private static final String RURAL = "Rural";
     private static final String SALARIO_MATERNIDADE = "Salário-Maternidade (Art. 71/73)";
@@ -43,7 +41,6 @@ public  class AudienciaRowMapper {
         String sala =  row.getCell(8).getStringCellValue();
         String situacao =  row.getCell(9).getStringCellValue();
         Turno turno = getTurno(hora);
-        Prioridade prioridade = getPrioridade(assunto, advogados);
         Uf uf = getUfFromOrgaoJulgador(orgaoJulgador);
 
         return new AudienciaDTO(
@@ -60,7 +57,6 @@ public  class AudienciaRowMapper {
                 assunto,
                 tipo,
                 situacao,
-                prioridade,
                 uf
         );
 
@@ -69,14 +65,6 @@ public  class AudienciaRowMapper {
     private Uf getUfFromOrgaoJulgador(String orgaoJulgador) {
         String ultimaDuasLetras = orgaoJulgador.substring(orgaoJulgador.length() - 2);
         return Uf.valueOf(ultimaDuasLetras);
-    }
-
-    private Prioridade getPrioridade(String assunto, List<String> advogados) {
-        boolean impeditivoAdvogado = advogadoRepository.existsSuspeitoByNomeIn(advogados);
-        if (assunto.equals(SALARIO_MATERNIDADE) && impeditivoAdvogado) {
-            return ALTA;
-        }
-        return NORMAL;
     }
 
 

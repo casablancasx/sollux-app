@@ -39,22 +39,22 @@ public class PlanilhaService {
 
     public PlanilhaResponseDTO importarPlanilha(final MultipartFile file, final String token) throws Exception {
 
-        UsuarioEntity usuario = getUsuario(token);
+        //UsuarioEntity usuario = getUsuario(token);
 
         String hash = FileHashUtil.getFileHash(file, "SHA-256");
 
-        validator.validarArquivo(file, hash);
+        //validator.validarArquivo(file, hash);
 
         List<AudienciaDTO> audiencias = planilhaReader.lerPlanilha(file);
 
         audienciaService.enviarAudiencias(audiencias);
 
-        salvarPlanilha(file, hash, usuario);
+        //salvarPlanilha(file, hash, usuario);
 
         return new PlanilhaResponseDTO(
                 "Audiencias importadas com sucesso",
                 file.getOriginalFilename(),
-                usuario.getNome(),
+                "TESTE",
                 hash,
                 audiencias.size()
         );
