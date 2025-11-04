@@ -1,8 +1,12 @@
 package br.gov.agu.nutec.solluxapp.reader;
 
 import br.gov.agu.nutec.solluxapp.dto.AudienciaDTO;
+import br.gov.agu.nutec.solluxapp.dto.AudienciaMessage;
+import br.gov.agu.nutec.solluxapp.enums.TipoContestacao;
 import br.gov.agu.nutec.solluxapp.exceptions.PlanilhaException;
 import br.gov.agu.nutec.solluxapp.mapper.AudienciaRowMapper;
+import br.gov.agu.nutec.solluxapp.producer.AudienciaProducer;
+import br.gov.agu.nutec.solluxapp.service.ContestacaoService;
 import br.gov.agu.nutec.solluxapp.validator.PlanilhaValidator;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
@@ -21,25 +25,25 @@ import java.util.List;
 public class PlanilhaReader {
 
     private final AudienciaRowMapper audienciaRowMapper;
+    private final AudienciaProducer producer;
+    private final ContestacaoService  contestacaoService;
     private final PlanilhaValidator validator;
 
-    public List<AudienciaDTO> lerPlanilha(final MultipartFile file) {
+    public void lerPlanilha(final MultipartFile file, String token) {
         try (InputStream is = file.getInputStream(); Workbook workbook = WorkbookFactory.create(is)) {
             Sheet sheet = workbook.getSheetAt(0);
 
             validator.validarPlanilha(sheet);
 
-            List<AudienciaDTO> audiencias = new ArrayList<>();
             for (Row row : sheet) {
-
                 if (row == null || row.getRowNum() == 0) continue;
                 if (row.getCell(0) == null) break;
 
                 AudienciaDTO audienciaDTO = audienciaRowMapper.getAudienciaRow(row);
-                audiencias.add(audienciaDTO);
+                TipoContestacao tipoContestacao = contestacaoService.buscarTipoConstestacao(audienciaDTO.getCnj(),token);
+                audienciaDTO.setTipoContestacao(tipoContestacao);
+                producer.enviarAudiencia(new AudienciaMessage(audienciaDTO));
             }
-
-            return audiencias;
         } catch (Exception e) {
             throw new PlanilhaException("Erro ao ler a planilha");
         }

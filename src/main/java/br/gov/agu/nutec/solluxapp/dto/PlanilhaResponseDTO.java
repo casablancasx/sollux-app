@@ -5,6 +5,5 @@ public record PlanilhaResponseDTO(
         String message,
         String file,
         String user,
-        String hash,
-        int totalAudiencias) {
+        String hash) {
 }

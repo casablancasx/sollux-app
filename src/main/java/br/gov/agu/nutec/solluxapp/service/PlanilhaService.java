@@ -30,7 +30,6 @@ public class PlanilhaService {
     private final PlanilhaRepository planilhaRepository;
     private final UsuarioRepository usuarioRepository;
     private final PlanilhaReader planilhaReader;
-    private final AudienciaService audienciaService;
     private final PlanilhaValidator validator;
 
     @Value("${app.timezone}")
@@ -45,9 +44,7 @@ public class PlanilhaService {
 
         //validator.validarArquivo(file, hash);
 
-        List<AudienciaDTO> audiencias = planilhaReader.lerPlanilha(file);
-
-        audienciaService.enviarAudiencias(audiencias);
+        planilhaReader.lerPlanilha(file,token);
 
         //salvarPlanilha(file, hash, usuario);
 
@@ -55,8 +52,7 @@ public class PlanilhaService {
                 "Audiencias importadas com sucesso",
                 file.getOriginalFilename(),
                 "TESTE",
-                hash,
-                audiencias.size()
+                hash
         );
     }
 
