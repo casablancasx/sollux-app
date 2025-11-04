@@ -31,6 +31,19 @@ public class AudienciaDTO {
     private String situacao;
     private Uf uf;
     private TipoContestacao tipoContestacao;
+
+    public AudienciaDTO(String cnj, LocalDate data, String hora, Turno turno, String sala, String orgaoJulgador, String poloAtivo, String poloPassivo, String classeJudicial, List<String> advogados, String assunto, String tipo, String situacao, Uf uf) {
+        this.cnj = cnj;
+        this.data = data;
+        this.hora = hora;
+        this.turno = turno;
+        this.sala = sala;
+        this.orgaoJulgador = orgaoJulgador;
+        this.poloAtivo = poloAtivo;
+        this.poloPassivo = poloPassivo;
+        this.classeJudicial = classeJudicial;
+        this.advogados = advogados;
+    }
 }
 
 
