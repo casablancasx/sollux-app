@@ -1,8 +1,6 @@
 package br.gov.agu.nutec.solluxapp.reader;
 
 import br.gov.agu.nutec.solluxapp.dto.AudienciaDTO;
-import br.gov.agu.nutec.solluxapp.dto.AudienciaMessage;
-import br.gov.agu.nutec.solluxapp.enums.TipoContestacao;
 import br.gov.agu.nutec.solluxapp.exceptions.PlanilhaException;
 import br.gov.agu.nutec.solluxapp.mapper.AudienciaRowMapper;
 import br.gov.agu.nutec.solluxapp.producer.AudienciaProducer;
@@ -25,11 +23,10 @@ import java.util.List;
 public class PlanilhaReader {
 
     private final AudienciaRowMapper audienciaRowMapper;
-    private final AudienciaProducer producer;
-    private final ContestacaoService  contestacaoService;
     private final PlanilhaValidator validator;
 
-    public void lerPlanilha(final MultipartFile file, String token) {
+    public List<AudienciaDTO> lerPlanilha(final MultipartFile file, String token) {
+        List<AudienciaDTO> audiencias = new ArrayList<>();
         try (InputStream is = file.getInputStream(); Workbook workbook = WorkbookFactory.create(is)) {
             Sheet sheet = workbook.getSheetAt(0);
 
@@ -37,14 +34,14 @@ public class PlanilhaReader {
 
             for (Row row : sheet) {
                 if (row == null || row.getRowNum() == 0) continue;
-                if (row.getCell(0) == null) break;
+                if (row.getCell(0) == null || row.getCell(0).getStringCellValue().equals("")) break;
 
                 AudienciaDTO audienciaDTO = audienciaRowMapper.getAudienciaRow(row);
-                TipoContestacao tipoContestacao = contestacaoService.buscarTipoConstestacao(audienciaDTO.getCnj(),token);
-                audienciaDTO.setTipoContestacao(tipoContestacao);
-                producer.enviarAudiencia(new AudienciaMessage(audienciaDTO));
+                audiencias.add(audienciaDTO);
             }
+            return audiencias;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new PlanilhaException("Erro ao ler a planilha");
         }
     }
