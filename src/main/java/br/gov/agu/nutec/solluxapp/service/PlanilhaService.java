@@ -1,12 +1,16 @@
 package br.gov.agu.nutec.solluxapp.service;
 
 import br.gov.agu.nutec.solluxapp.dto.AudienciaDTO;
+import br.gov.agu.nutec.solluxapp.dto.AudienciaMessage;
 import br.gov.agu.nutec.solluxapp.dto.PlanilhaResponseDTO;
 import br.gov.agu.nutec.solluxapp.entity.PlanilhaEntity;
 import br.gov.agu.nutec.solluxapp.entity.UsuarioEntity;
 import br.gov.agu.nutec.solluxapp.enums.Role;
+import br.gov.agu.nutec.solluxapp.enums.Status;
+import br.gov.agu.nutec.solluxapp.enums.TipoContestacao;
 import br.gov.agu.nutec.solluxapp.exceptions.ResourceNotFoundException;
 import br.gov.agu.nutec.solluxapp.exceptions.UserUnauthorizedException;
+import br.gov.agu.nutec.solluxapp.producer.AudienciaProducer;
 import br.gov.agu.nutec.solluxapp.reader.PlanilhaReader;
 import br.gov.agu.nutec.solluxapp.repository.PlanilhaRepository;
 import br.gov.agu.nutec.solluxapp.repository.UsuarioRepository;
@@ -30,14 +34,16 @@ public class PlanilhaService {
     private final PlanilhaRepository planilhaRepository;
     private final UsuarioRepository usuarioRepository;
     private final PlanilhaReader planilhaReader;
-    private final AudienciaService audienciaService;
     private final PlanilhaValidator validator;
+    private final ContestacaoService contestacaoService;
+    private final TokenService tokenService;
+    private final AudienciaProducer audienciaProducer;
 
     @Value("${app.timezone}")
     private String timeZone;
 
 
-    public PlanilhaResponseDTO importarPlanilha(final MultipartFile file, final String token) throws Exception {
+    public PlanilhaResponseDTO importarPlanilha(final MultipartFile file, String token) throws Exception {
 
         //UsuarioEntity usuario = getUsuario(token);
 
@@ -45,9 +51,14 @@ public class PlanilhaService {
 
         //validator.validarArquivo(file, hash);
 
-        List<AudienciaDTO> audiencias = planilhaReader.lerPlanilha(file);
+        List<AudienciaDTO> audiencias = planilhaReader.lerPlanilha(file,token);
 
-        audienciaService.enviarAudiencias(audiencias);
+        audiencias = contestacaoService.buscarTipoConstestacao(audiencias, token);
+
+        for (AudienciaDTO audiencia : audiencias) {
+            Status status = audiencia.equals(audiencias.getLast()) ? Status.FINALIZADO : Status.EM_ANDAMENTO;
+            audienciaProducer.enviarAudiencia(new AudienciaMessage(status, audiencia));
+        }
 
         //salvarPlanilha(file, hash, usuario);
 
@@ -55,8 +66,7 @@ public class PlanilhaService {
                 "Audiencias importadas com sucesso",
                 file.getOriginalFilename(),
                 "TESTE",
-                hash,
-                audiencias.size()
+                hash
         );
     }
 
