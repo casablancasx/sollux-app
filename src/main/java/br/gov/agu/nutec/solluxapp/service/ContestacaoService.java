@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,19 +24,19 @@ public class ContestacaoService {
 
     private final SapiensAdapter adapter;
     private final TokenService tokenService;
-
-
+    
     public List<AudienciaDTO> buscarTipoConstestacao(List<AudienciaDTO> audiencias, String token) {
+        AtomicReference<String> tokenRef = new AtomicReference<>(token);
+
         return audiencias.parallelStream()
                 .peek(audiencia -> {
+                    tokenRef.set(tokenService.renovarTokenSeNecessario(tokenRef.get()));
                     long processoId = adapter.getProcessoIdPorCnj(audiencia.getCnj(), token);
                     long documentoContestacaoId = adapter.getIdDocumentoContestacao(processoId, token);
                     String htmlBase64Contestacao = adapter.getHtmlBase64Documento(documentoContestacaoId, token);
 
-                    String html = decodeHtmlFromBase64(htmlBase64Contestacao);
-                    TipoContestacao tipo = extrairTipoContestacao(html);
-
-                    audiencia.setTipoContestacao(tipo);
+                    String html = new String(Base64.getDecoder().decode(htmlBase64Contestacao), StandardCharsets.UTF_8);
+                    audiencia.setTipoContestacao(extrairTipoContestacao(html));
                 })
                 .toList();
     }
