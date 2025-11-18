@@ -16,7 +16,7 @@ public class SapiensAdapter {
     private final WebClient webClient;
 
 
-    public long getIdDocumentoContestacao(long processoId, String token){
+    public Long getIdDocumentoContestacao(long processoId, String token){
 
 
 
@@ -62,7 +62,7 @@ public class SapiensAdapter {
 
     }
 
-    public long getProcessoIdPorCnj(String numeroProcesso, String token){
+    public Long getProcessoIdPorCnj(String numeroProcesso, String token){
 
         String cnjDesformatado = numeroProcesso.replaceAll("[.-]", "");
 

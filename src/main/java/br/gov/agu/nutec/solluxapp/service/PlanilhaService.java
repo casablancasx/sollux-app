@@ -50,9 +50,9 @@ public class PlanilhaService {
         String hash = FileHashUtil.getFileHash(file, "SHA-256");
 
         //validator.validarArquivo(file, hash);
-
+        System.out.println("iniciando leitura planilha");
         List<AudienciaDTO> audiencias = planilhaReader.lerPlanilha(file,token);
-
+        System.out.println("Audiencias carregadas...");
         audiencias = contestacaoService.buscarTipoConstestacao(audiencias, token);
 
         for (AudienciaDTO audiencia : audiencias) {

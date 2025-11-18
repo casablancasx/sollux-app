@@ -14,6 +14,7 @@ public class TokenService {
 
     public String renovarTokenSeNecessario(String token) {
         if (contador.decrementAndGet() <= 0) {
+            System.out.println("Token Renovada com sucesso");
             contador.set(500);
             return adapter.renovarToken(token);
         }
