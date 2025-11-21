@@ -23,9 +23,11 @@ public class ContestacaoService {
     private static final Pattern TIPOS_PATTERN = Pattern.compile("\\bTIPO\\s*(1|2|3|4|5)\\b", Pattern.CASE_INSENSITIVE);
 
     private final SapiensAdapter adapter;
+    private final TokenManager tokenManager;
+
 
     public List<AudienciaDTO> buscarTipoConstestacao(List<AudienciaDTO> audiencias, String token) {
-        TokenManager tokenManager = new TokenManager(token,adapter);
+        tokenManager.setTokenInicial(token);
         for (AudienciaDTO audiencia : audiencias) {
             try {
                 String tokenAtual =  tokenManager.getToken();

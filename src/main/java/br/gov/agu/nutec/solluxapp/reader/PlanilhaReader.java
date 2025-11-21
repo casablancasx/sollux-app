@@ -3,8 +3,7 @@ package br.gov.agu.nutec.solluxapp.reader;
 import br.gov.agu.nutec.solluxapp.dto.AudienciaDTO;
 import br.gov.agu.nutec.solluxapp.exceptions.PlanilhaException;
 import br.gov.agu.nutec.solluxapp.mapper.AudienciaRowMapper;
-import br.gov.agu.nutec.solluxapp.producer.AudienciaProducer;
-import br.gov.agu.nutec.solluxapp.service.ContestacaoService;
+
 import br.gov.agu.nutec.solluxapp.validator.PlanilhaValidator;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;

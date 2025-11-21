@@ -96,7 +96,7 @@ public class SapiensAdapter {
     public String renovarToken(String tokenAntigo){
         return webClient.get()
                 .uri("/auth/refresh_token")
-                .header("Authorization",  tokenAntigo)
+                .header("Authorization", "Bearer " + tokenAntigo)
                 .retrieve()
                 .bodyToMono(JsonNode.class)
                 .block().get("token").asText();
