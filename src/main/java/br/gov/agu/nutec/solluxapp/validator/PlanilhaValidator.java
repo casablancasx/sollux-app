@@ -17,6 +17,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class PlanilhaValidator {
 
+
     private static final List<String> EXPECTED_COLUMNS = List.of(
             "Data/Hora",
             "Processo",
@@ -41,10 +42,15 @@ public class PlanilhaValidator {
             throw new PlanilhaException("Formato inválido. Apenas .xls ou .xlsx são suportados.");
         }
 
-        if (planilhaRepository.existsByHash(hash)) {
-            throw new PlanilhaException("Arquivo já importado anteriormente.");
+        planilhaRepository.findByHash(hash)
+                .ifPresent(planilha -> {
+                    if (planilha.isProcessamentoConcluido()) {
+                        throw new PlanilhaException("Planilha já processada anteriormente");
+                    }
+                    throw new PlanilhaException("A planilha já está com o processamento em andamento");
+                });
+
         }
-    }
 
     public void validarPlanilha(final Sheet sheet) {
         Row header = sheet.getRow(0);
@@ -71,3 +77,5 @@ public class PlanilhaValidator {
         return (cell == null) ? "" : cell.getStringCellValue().trim();
     }
 }
+
+

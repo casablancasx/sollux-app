@@ -33,4 +33,6 @@ public class PlanilhaEntity {
     @ManyToOne
     @JoinColumn(name = "upload_pelo_id", nullable = false)
     private UsuarioEntity usuario;
+
+    private boolean processamentoConcluido = false;
 }

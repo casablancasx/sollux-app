@@ -7,6 +7,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Component
 @RequiredArgsConstructor
@@ -16,7 +18,7 @@ public class SapiensAdapter {
     private final WebClient webClient;
 
 
-    public Long getIdDocumentoContestacao(long processoId, String token){
+    private Long getIdDocumentoContestacao(long processoId, String token){
 
 
 
@@ -45,7 +47,7 @@ public class SapiensAdapter {
     }
 
 
-    public String getHtmlBase64Documento(long documentoId, String token){
+    private String getHtmlBase64Documento(long documentoId, String token){
 
         var respostaRequisicao = webClient.get()
                 .uri(String.format("/v1/administrativo/componente_digital/%s/download",documentoId))
@@ -62,7 +64,7 @@ public class SapiensAdapter {
 
     }
 
-    public Long getProcessoIdPorCnj(String numeroProcesso, String token){
+    private Long getProcessoIdPorCnj(String numeroProcesso, String token){
 
         String cnjDesformatado = numeroProcesso.replaceAll("[.-]", "");
 
@@ -98,6 +100,13 @@ public class SapiensAdapter {
                 .retrieve()
                 .bodyToMono(JsonNode.class)
                 .block().get("token").asText();
+    }
+
+    public String obterHtmlConstestacaoPorCnj(String cnj, String token){
+        Long processoId = getProcessoIdPorCnj(cnj, token);
+        Long idDocumentoContestacao = getIdDocumentoContestacao(processoId, token);
+        String htmlConstestacaoBase64 = getHtmlBase64Documento(idDocumentoContestacao, token);
+        return new String(Base64.getDecoder().decode(htmlConstestacaoBase64), StandardCharsets.UTF_8);
     }
 
 

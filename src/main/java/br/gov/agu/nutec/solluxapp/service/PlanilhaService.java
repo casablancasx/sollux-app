@@ -7,7 +7,7 @@ import br.gov.agu.nutec.solluxapp.entity.PlanilhaEntity;
 import br.gov.agu.nutec.solluxapp.entity.UsuarioEntity;
 import br.gov.agu.nutec.solluxapp.enums.Role;
 import br.gov.agu.nutec.solluxapp.enums.Status;
-import br.gov.agu.nutec.solluxapp.enums.TipoContestacao;
+import br.gov.agu.nutec.solluxapp.exceptions.PlanilhaException;
 import br.gov.agu.nutec.solluxapp.exceptions.ResourceNotFoundException;
 import br.gov.agu.nutec.solluxapp.exceptions.UserUnauthorizedException;
 import br.gov.agu.nutec.solluxapp.producer.AudienciaProducer;
@@ -34,9 +34,7 @@ public class PlanilhaService {
     private final PlanilhaRepository planilhaRepository;
     private final UsuarioRepository usuarioRepository;
     private final PlanilhaReader planilhaReader;
-    private final PlanilhaValidator validator;
     private final ContestacaoService contestacaoService;
-    private final TokenService tokenService;
     private final AudienciaProducer audienciaProducer;
 
     @Value("${app.timezone}")
@@ -48,6 +46,7 @@ public class PlanilhaService {
         //UsuarioEntity usuario = getUsuario(token);
 
         String hash = FileHashUtil.getFileHash(file, "SHA-256");
+
 
         //validator.validarArquivo(file, hash);
         System.out.println("iniciando leitura planilha");

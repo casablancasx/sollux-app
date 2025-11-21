@@ -12,7 +12,8 @@ public enum TipoContestacao {
     TIPO4("TIPO4"),
     TIPO5("TIPO5"),
     SEM_CONTESTACAO("SEM CONTESTAÇÃO"),
-    SEM_TIPO("SEM TIPO");
+    SEM_TIPO("SEM TIPO"),
+    ERRO_SAPIENS("ERRO SAPIENS");
 
     private String descricao;
 
