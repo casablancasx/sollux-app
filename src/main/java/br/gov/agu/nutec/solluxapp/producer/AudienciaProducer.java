@@ -16,6 +16,6 @@ public class AudienciaProducer {
     private String exchangeAudienciaPendente;
 
     public void enviarAudiencia(AudienciaMessage audienciaMessage) {
-        rabbitTemplate.convertAndSend(exchangeAudienciaPendente,"",audienciaMessage);
+        rabbitTemplate.convertAndSend(exchangeAudienciaPendente,"audiencia.pendente",audienciaMessage);
     }
 }
