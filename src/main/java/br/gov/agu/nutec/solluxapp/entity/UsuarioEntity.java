@@ -1,6 +1,7 @@
 package br.gov.agu.nutec.solluxapp.entity;
 
 import br.gov.agu.nutec.solluxapp.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +32,7 @@ public class UsuarioEntity {
     private Role role;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<PlanilhaEntity> planilhas;
 
 

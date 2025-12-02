@@ -40,8 +40,9 @@ public  class AudienciaRowMapper {
         String tipo =  row.getCell(7).getStringCellValue();
         String sala =  row.getCell(8).getStringCellValue();
         String situacao =  row.getCell(9).getStringCellValue();
-        Turno turno = getTurno(hora);
         Uf uf = getUfFromOrgaoJulgador(orgaoJulgador);
+        Turno turno = getTurno(hora);
+
 
         return new AudienciaDTO(
                 cnj,

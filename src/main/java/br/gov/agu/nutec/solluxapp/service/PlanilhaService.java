@@ -1,16 +1,11 @@
 package br.gov.agu.nutec.solluxapp.service;
 
-import br.gov.agu.nutec.solluxapp.dto.AudienciaDTO;
-import br.gov.agu.nutec.solluxapp.dto.AudienciaMessage;
-import br.gov.agu.nutec.solluxapp.dto.PlanilhaResponseDTO;
+import br.gov.agu.nutec.solluxapp.dto.*;
 import br.gov.agu.nutec.solluxapp.entity.PlanilhaEntity;
 import br.gov.agu.nutec.solluxapp.entity.UsuarioEntity;
 import br.gov.agu.nutec.solluxapp.enums.Role;
-import br.gov.agu.nutec.solluxapp.enums.Status;
-import br.gov.agu.nutec.solluxapp.exceptions.PlanilhaException;
 import br.gov.agu.nutec.solluxapp.exceptions.ResourceNotFoundException;
 import br.gov.agu.nutec.solluxapp.exceptions.UserUnauthorizedException;
-import br.gov.agu.nutec.solluxapp.producer.AudienciaProducer;
 import br.gov.agu.nutec.solluxapp.reader.PlanilhaReader;
 import br.gov.agu.nutec.solluxapp.repository.PlanilhaRepository;
 import br.gov.agu.nutec.solluxapp.repository.UsuarioRepository;
@@ -19,6 +14,10 @@ import br.gov.agu.nutec.solluxapp.util.TokenUtil;
 import br.gov.agu.nutec.solluxapp.validator.PlanilhaValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,40 +33,67 @@ public class PlanilhaService {
     private final PlanilhaRepository planilhaRepository;
     private final UsuarioRepository usuarioRepository;
     private final PlanilhaReader planilhaReader;
-    private final ContestacaoService contestacaoService;
-    private final AudienciaProducer audienciaProducer;
+    private final AudienciaAsyncService audienciaAsyncService;
+    private final PlanilhaValidator validator;
 
     @Value("${app.timezone}")
     private String timeZone;
 
 
-    public PlanilhaResponseDTO importarPlanilha(final MultipartFile file, String token) throws Exception {
+    public PlanilhaDTO importarPlanilha(final MultipartFile file, String token) throws Exception {
 
-        //UsuarioEntity usuario = getUsuario(token);
+        PlanilhaEntity planilha = new PlanilhaEntity();
+        planilha.setNomeArquivo(file.getOriginalFilename());
+        planilha.setDataUpload(LocalDateTime.now(ZoneId.of(timeZone)));
+        UsuarioEntity usuario = getUsuario(token);
+        planilha.setUsuario(usuario);
+        planilha.setProcessamentoConcluido(false);
 
         String hash = FileHashUtil.getFileHash(file, "SHA-256");
+        planilha.setHash(hash);
 
+        validator.validarArquivo(file, hash);
+        planilhaRepository.save(planilha);
 
-        //validator.validarArquivo(file, hash);
-        System.out.println("iniciando leitura planilha");
         List<AudienciaDTO> audiencias = planilhaReader.lerPlanilha(file,token);
-        System.out.println("Audiencias carregadas...");
-        audiencias = contestacaoService.buscarTipoConstestacao(audiencias, token);
 
-        for (AudienciaDTO audiencia : audiencias) {
-            Status status = audiencia.equals(audiencias.getLast()) ? Status.FINALIZADO : Status.EM_ANDAMENTO;
-            audienciaProducer.enviarAudiencia(new AudienciaMessage(status, audiencia));
-        }
+        audienciaAsyncService.processarAudienciasAsync(audiencias, planilha, token);
 
-        //salvarPlanilha(file, hash, usuario);
-
-        return new PlanilhaResponseDTO(
+        return new PlanilhaDTO(
                 "Audiencias importadas com sucesso",
                 file.getOriginalFilename(),
-                "TESTE",
+                usuario.getNome(),
                 hash
         );
     }
+
+
+    public PageResponse<PlanilhaResponseDTO> listarPlanilhasPaginadas(int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dataUpload"));
+        Page<PlanilhaEntity> planilhasPage = planilhaRepository.findAll(pageable);
+
+        List<PlanilhaResponseDTO> content = planilhasPage.getContent().stream()
+                .map(this::toPlanilhaResponseDTO)
+                .toList();
+
+        return new PageResponse<>(
+                content,
+                planilhasPage.getNumber(),
+                planilhasPage.getSize(),
+                planilhasPage.getTotalElements(),
+                planilhasPage.getTotalPages()
+        );
+    }
+
+    private PlanilhaResponseDTO toPlanilhaResponseDTO(PlanilhaEntity planilha) {
+        PlanilhaResponseDTO dto = new PlanilhaResponseDTO();
+        dto.setAdicionadaPor(planilha.getUsuario().getNome());
+        dto.setNomeArquivo(planilha.getNomeArquivo());
+        dto.setProcessamentoConcluido(planilha.isProcessamentoConcluido());
+        return dto;
+    }
+
+
 
 
 

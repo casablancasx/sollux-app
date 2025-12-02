@@ -1,9 +1,11 @@
 package br.gov.agu.nutec.solluxapp.dto;
 
+import lombok.Data;
 
-public record PlanilhaResponseDTO(
-        String message,
-        String file,
-        String user,
-        String hash) {
+@Data
+public class PlanilhaResponseDTO {
+
+    private String adicionadaPor;
+    private String nomeArquivo;
+    private boolean processamentoConcluido;
 }

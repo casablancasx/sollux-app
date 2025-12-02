@@ -1,5 +1,7 @@
 package br.gov.agu.nutec.solluxapp.controller;
 
+import br.gov.agu.nutec.solluxapp.dto.PageResponse;
+import br.gov.agu.nutec.solluxapp.dto.PlanilhaDTO;
 import br.gov.agu.nutec.solluxapp.dto.PlanilhaResponseDTO;
 import br.gov.agu.nutec.solluxapp.service.PlanilhaService;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +19,14 @@ public class PlanilhaController {
 
 
     @PostMapping("/importar")
-    public synchronized ResponseEntity<PlanilhaResponseDTO> importarPlanilha(final @RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String token) throws Exception {
+    public synchronized ResponseEntity<PlanilhaDTO> importarPlanilha(final @RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String token) throws Exception {
         token = token.replace("Bearer ", "");
-        System.out.println("iniciando processo...");
-        PlanilhaResponseDTO response = planilhaService.importarPlanilha(file,token);
+        PlanilhaDTO response = planilhaService.importarPlanilha(file,token);
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping
+    public ResponseEntity<PageResponse<PlanilhaResponseDTO>> listarPlanilhasPaginadas(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
+        return ResponseEntity.ok(planilhaService.listarPlanilhasPaginadas(page, size));
+    }
 }

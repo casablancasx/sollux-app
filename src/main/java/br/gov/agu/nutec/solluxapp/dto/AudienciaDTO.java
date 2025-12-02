@@ -32,6 +32,7 @@ public class AudienciaDTO {
     private Uf uf;
     private TipoContestacao tipoContestacao;
 
+
     public AudienciaDTO(String cnj, LocalDate data, String hora, Turno turno, String sala, String orgaoJulgador, String poloAtivo, String poloPassivo, String classeJudicial, List<String> advogados, String assunto, String tipo, String situacao, Uf uf) {
         this.cnj = cnj;
         this.data = data;
@@ -43,6 +44,10 @@ public class AudienciaDTO {
         this.poloPassivo = poloPassivo;
         this.classeJudicial = classeJudicial;
         this.advogados = advogados;
+        this.assunto = assunto;
+        this.tipo = tipo;
+        this.situacao = situacao;
+        this.uf = uf;
     }
 }
 

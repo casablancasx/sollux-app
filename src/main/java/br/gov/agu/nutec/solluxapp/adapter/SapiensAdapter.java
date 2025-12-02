@@ -26,6 +26,7 @@ public class SapiensAdapter {
         String populateParam = "populate=[\"documento\", \"documento.componentesDigitais\"]";
         String limitParam = "limit=1";
         String offsetParam = "offset=0";
+        String orderParam = "order={\"numeracaoSequencial\":\"ASC\"}";
 
 
         URI uri = UriComponentsBuilder.fromUriString("https://supersapiensbackend.agu.gov.br/v1/administrativo/juntada")
@@ -33,6 +34,7 @@ public class SapiensAdapter {
                 .query(limitParam)
                 .query(populateParam)
                 .query(offsetParam)
+                .query(orderParam)
                 .build()
                 .toUri();
 

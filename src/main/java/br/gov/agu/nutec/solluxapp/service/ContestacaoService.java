@@ -20,8 +20,7 @@ import static br.gov.agu.nutec.solluxapp.enums.TipoContestacao.*;
 @RequiredArgsConstructor
 public class ContestacaoService {
 
-    private static final Pattern TIPOS_PATTERN = Pattern.compile("\\bTIPO\\s*(1|2|3|4|5)\\b", Pattern.CASE_INSENSITIVE);
-
+    private static final Pattern TIPOS_PATTERN = Pattern.compile("\\bTIPO\\s*([1-5])\\b", Pattern.CASE_INSENSITIVE);
     private final SapiensAdapter adapter;
     private final TokenManager tokenManager;
 
