@@ -5,7 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -49,7 +52,7 @@ public class SapiensAdapter {
     }
 
 
-    private String getHtmlBase64Documento(long documentoId, String token){
+    private String getArquivoBase64Documento(long documentoId, String token){
 
         var respostaRequisicao = webClient.get()
                 .uri(String.format("/v1/administrativo/componente_digital/%s/download",documentoId))
@@ -104,11 +107,32 @@ public class SapiensAdapter {
                 .block().get("token").asText();
     }
 
-    public String obterHtmlConstestacaoPorCnj(String cnj, String token){
+    private String extrairTextoPdf(byte[] bytesPdf) {
+        try (PDDocument documento = PDDocument.load(bytesPdf)) {
+            PDFTextStripper stripper = new PDFTextStripper();
+
+            return stripper.getText(documento);
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao ler PDF: ", e);
+        }
+
+    }
+
+    public String obterArquivoConstestacaoPorCnj(String cnj, String token){
         Long processoId = getProcessoIdPorCnj(cnj, token);
         Long idDocumentoContestacao = getIdDocumentoContestacao(processoId, token);
-        String htmlConstestacaoBase64 = getHtmlBase64Documento(idDocumentoContestacao, token);
-        return new String(Base64.getDecoder().decode(htmlConstestacaoBase64), StandardCharsets.UTF_8);
+        String arquivoConstestacaoBase64 = getArquivoBase64Documento(idDocumentoContestacao, token);
+        byte[] bytesArquivo = Base64.getDecoder().decode(arquivoConstestacaoBase64);
+        String inicioArquivo = new String(bytesArquivo, StandardCharsets.ISO_8859_1);
+
+        if (inicioArquivo.startsWith("%PDF")) {
+            return extrairTextoPdf(bytesArquivo);
+
+        } else {
+            return new String(bytesArquivo, StandardCharsets.UTF_8);
+
+        }
+
     }
 
 

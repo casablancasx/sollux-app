@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,8 +28,8 @@ public class ContestacaoService {
         for (AudienciaDTO audiencia : audiencias) {
             try {
                 String tokenAtual =  tokenManager.getToken();
-                String html = adapter.obterHtmlConstestacaoPorCnj(audiencia.getCnj(), tokenAtual);
-                TipoContestacao tipo = extrairTipoContestacao(html);
+                String arquivo = adapter.obterArquivoConstestacaoPorCnj(audiencia.getCnj(), tokenAtual);
+                TipoContestacao tipo = extrairTipoContestacao(arquivo);
                 System.out.println("Tipo encontrado: " + tipo + " para CNJ: " + audiencia.getCnj());
                 audiencia.setTipoContestacao(tipo);
             } catch (WebClientResponseException e) {
@@ -46,8 +44,8 @@ public class ContestacaoService {
     }
 
 
-    private TipoContestacao extrairTipoContestacao(String html) {
-        Matcher matcher = TIPOS_PATTERN.matcher(html);
+    private TipoContestacao extrairTipoContestacao(String arquivo) {
+        Matcher matcher = TIPOS_PATTERN.matcher(arquivo);
 
         if (matcher.find()) {
             String tipo = matcher.group().toUpperCase();

@@ -45,7 +45,9 @@ public class PlanilhaService {
         PlanilhaEntity planilha = new PlanilhaEntity();
         planilha.setNomeArquivo(file.getOriginalFilename());
         planilha.setDataUpload(LocalDateTime.now(ZoneId.of(timeZone)));
-        UsuarioEntity usuario = getUsuario(token);
+        // UsuarioEntity usuario = getUsuario(token);
+        UsuarioEntity usuario = new UsuarioEntity(3932L,"teste", "teste", "teste", Role.ADMIN,null);
+        usuarioRepository.save(usuario);
         planilha.setUsuario(usuario);
         planilha.setProcessamentoConcluido(false);
 
